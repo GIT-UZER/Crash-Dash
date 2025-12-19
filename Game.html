@@ -239,6 +239,12 @@
         <div class="editor-tool" onclick="selectTool('PORTAL_SHIP')" id="tool-PORTAL_SHIP" style="color:#FF00FF">SHIP</div>
         <div class="editor-tool" onclick="selectTool('PORTAL_CUBE')" id="tool-PORTAL_CUBE" style="color:#00FF00">CUBE</div>
         <div class="editor-tool" onclick="selectTool('PORTAL_WAVE')" id="tool-PORTAL_WAVE" style="color:#00FFFF">WAVE</div>
+        
+        <!-- NEW TOOLS -->
+        <div class="editor-tool" onclick="selectTool('ORB_YELLOW')" id="tool-ORB_YELLOW" style="color:#FFFF00; font-size:10px;">Y-ORB</div>
+        <div class="editor-tool" onclick="selectTool('PORTAL_GRAVITY_UP')" id="tool-PORTAL_GRAVITY_UP" style="color:#FFD700; font-size:9px;">G-UP</div>
+        <div class="editor-tool" onclick="selectTool('PORTAL_GRAVITY_DOWN')" id="tool-PORTAL_GRAVITY_DOWN" style="color:#2196F3; font-size:9px;">G-DOWN</div>
+
         <div class="editor-tool" onclick="selectTool('ERASER')" id="tool-ERASER" style="border-color: red;">ERASE</div>
     </div>
 
@@ -465,25 +471,30 @@
                 {x: 15, y: 0, type: 'BLOCK'}, {x: 15, y: 1, type: 'BLOCK'},
                 {x: 20, y: 0, type: 'SPIKE'}, {x: 20.5, y: 0, type: 'SPIKE'},
                 
-                // Wave Section
-                {x: 30, y: 1, type: 'PORTAL_WAVE'},
-                {x: 40, y: 5, type: 'BLOCK'}, {x: 40, y: 4, type: 'BLOCK'},
-                {x: 50, y: 2, type: 'BLOCK'}, {x: 50, y: 7, type: 'BLOCK'},
-                {x: 60, y: 5, type: 'COIN'}, // Coin 1
-                {x: 70, y: 3, type: 'BLOCK'}, {x: 70, y: 6, type: 'BLOCK'},
+                // ORB SECTION
+                {x: 25, y: 0, type: 'BLOCK'}, {x: 28, y: 2, type: 'ORB_YELLOW'},
+                {x: 32, y: 3, type: 'BLOCK'}, {x: 35, y: 4, type: 'ORB_YELLOW'},
+                {x: 38, y: 5, type: 'BLOCK'}, 
                 
-                // Ship Section
-                {x: 85, y: 1, type: 'PORTAL_SHIP'},
-                {x: 95, y: 4, type: 'BLOCK'}, 
-                {x: 105, y: 5, type: 'BLOCK'}, {x: 105, y: 1, type: 'COIN'}, // Coin 2 (Low)
-                {x: 115, y: 3, type: 'BLOCK'},
+                // GRAVITY FLIP
+                {x: 45, y: 5, type: 'PORTAL_GRAVITY_UP'},
+                {x: 50, y: 9, type: 'BLOCK'}, {x: 50, y: 8, type: 'SPIKE_TOP'}, // Upside down logic
+                {x: 55, y: 9, type: 'BLOCK'}, {x: 55, y: 8, type: 'BLOCK'},
                 
-                // Cube Finish
-                {x: 130, y: 1, type: 'PORTAL_CUBE'},
-                {x: 135, y: 0, type: 'BLOCK'}, {x: 135, y: 1, type: 'BLOCK'},
-                {x: 140, y: 0, type: 'SPIKE'}, {x: 141, y: 0, type: 'SPIKE'},
-                {x: 145, y: 2, type: 'BLOCK'}, {x: 145, y: 3, type: 'COIN'}, // Coin 3
-                {x: 150, y: 0, type: 'BLOCK'}
+                // UPSIDE DOWN SHIP
+                {x: 65, y: 5, type: 'PORTAL_SHIP'},
+                {x: 75, y: 2, type: 'BLOCK'}, {x: 75, y: 7, type: 'BLOCK'},
+                {x: 85, y: 5, type: 'COIN'}, // Coin while upside down flying
+                
+                // FLIP BACK
+                {x: 95, y: 5, type: 'PORTAL_GRAVITY_DOWN'},
+                {x: 100, y: 5, type: 'PORTAL_CUBE'},
+                
+                // Normal ending
+                {x: 110, y: 0, type: 'BLOCK'}, {x: 115, y: 0, type: 'SPIKE'},
+                {x: 120, y: 2, type: 'ORB_YELLOW'}, {x: 125, y: 0, type: 'BLOCK'},
+                {x: 130, y: 0, type: 'BLOCK'}, {x: 130, y: 1, type: 'BLOCK'},
+                {x: 140, y: 0, type: 'BLOCK'}, {x: 140, y: 1, type: 'BLOCK'}, {x: 140, y: 2, type: 'BLOCK'}
             ],
             'SUPER_WAVE': [
                 {x: 5, y: 1, type: 'PORTAL_WAVE'},
@@ -622,6 +633,10 @@
                 this.trail = [];
                 this.scale = 1.0;
                 this.mode = 'CUBE'; 
+                this.gravity = 1; // 1 = Normal, -1 = Upside Down
+                
+                // NEW: Double jump state
+                this.canDoubleJump = true;
             }
 
             update() {
@@ -629,11 +644,13 @@
 
                 if (gameState === 'PLAYING') {
                     if (this.mode === 'CUBE') {
-                        this.dy += GRAVITY;
+                        // Apply gravity relative to orientation
+                        this.dy += GRAVITY * this.gravity;
                         this.y += this.dy;
 
-                        if (!this.isGrounded) this.rotation += 6.5; 
-                        else {
+                        if (!this.isGrounded) {
+                            this.rotation += 6.5 * this.gravity; 
+                        } else {
                             let rem = this.rotation % 90;
                             if (rem !== 0) {
                                 if (rem > 45) this.rotation += (90 - rem) * 0.3;
@@ -642,43 +659,64 @@
                             }
                         }
                     } else if (this.mode === 'SHIP') {
-                        this.dy += SHIP_GRAVITY;
-                        if (isJumpHeld) this.dy += SHIP_LIFT;
+                        this.dy += SHIP_GRAVITY * this.gravity;
+                        if (isJumpHeld) this.dy += SHIP_LIFT * this.gravity;
+                        
+                        // Velocity clamping
                         if (this.dy > 10) this.dy = 10;
                         if (this.dy < -10) this.dy = -10;
+                        
                         this.y += this.dy;
-                        this.rotation = this.dy * 2;
+                        this.rotation = this.dy * 2 * this.gravity;
                     } else if (this.mode === 'WAVE') {
-                        if (isJumpHeld) {
+                        // Wave isn't usually affected by gravity portals in the same way (it flips its own gravity)
+                        // But for consistency we can flip the controls
+                        let thrust = isJumpHeld;
+                        if(this.gravity === -1) thrust = !thrust; // Invert controls for upside down wave
+
+                        if (thrust) {
                             this.dy = -WAVE_SPEED; 
-                            this.rotation = -30; // Reduced angle
+                            this.rotation = -30;
                         } else {
                             this.dy = WAVE_SPEED; 
-                            this.rotation = 30; // Reduced angle
+                            this.rotation = 30;
                         }
                         this.y += this.dy;
                     }
 
-                    // Floor Collision
-                    if (this.mode === 'WAVE') {
-                         if (this.y > groundY - this.size) {
-                             this.y = groundY - this.size;
-                             this.rotation = 0; 
-                         }
-                         if (this.y < 0) {
-                             this.y = 0;
-                             this.rotation = 0; 
-                         }
-                    } else {
-                        if (this.y > groundY - this.size) {
-                            this.y = groundY - this.size;
-                            this.dy = 0;
-                            this.isGrounded = true;
-                            if (this.mode === 'SHIP') this.rotation = 0;
+                    // Floor/Ceiling Collision (Global Boundaries)
+                    // Normal Gravity: Floor is groundY
+                    if (this.gravity === 1) {
+                        if (this.mode === 'WAVE') {
+                             if (this.y > groundY - this.size) { this.y = groundY - this.size; this.rotation = 0; }
+                             if (this.y < 0) { this.y = 0; this.rotation = 0; }
+                        } else {
+                            if (this.y > groundY - this.size) {
+                                this.y = groundY - this.size;
+                                this.dy = 0;
+                                this.isGrounded = true;
+                                this.canDoubleJump = true; // RESET Double Jump on floor
+                                if (this.mode === 'SHIP') this.rotation = 0;
+                            }
+                            if (this.y < -500) { // High ceiling cap
+                                this.y = -500;
+                                if (this.dy < 0) this.dy = 0;
+                            }
                         }
-                        if (this.y < 0) {
-                            this.y = 0;
-                            if (this.dy < 0) this.dy = 0;
+                    } 
+                    // Upside Down Gravity
+                    else {
+                        if (this.y < -100) { 
+                             // Cap
+                        }
+                        if (this.y > groundY + 100) { 
+                             // Cap
+                        }
+                        
+                        // Wave Clamping Inverted
+                        if (this.mode === 'WAVE') {
+                             if (this.y > groundY - this.size) { this.y = groundY - this.size; this.rotation = 0; }
+                             if (this.y < 0) { this.y = 0; this.rotation = 0; }
                         }
                     }
                 } else if (gameState === 'COMPLETE_ANIM') {
@@ -691,17 +729,39 @@
 
             updateTrail() {
                 if (gameState === 'PLAYING') {
-                    this.trail.push({ x: this.x, y: this.y, r: this.rotation, alpha: 0.6, mode: this.mode });
+                    this.trail.push({ x: this.x, y: this.y, r: this.rotation, alpha: 0.6, mode: this.mode, gravity: this.gravity });
                     if (this.trail.length > 20) this.trail.shift(); 
                 }
             }
 
             jump() {
+                // Regular Jump (Ground only)
                 if (this.mode === 'CUBE' && this.isGrounded) {
-                    this.dy = JUMP_FORCE;
+                    this.dy = JUMP_FORCE * this.gravity;
                     this.isGrounded = false;
                     playSound('jump');
                 }
+            }
+            
+            // NEW: Separate method for mid-air jumps (triggered by distinct press)
+            attemptAirJump() {
+                if (this.mode === 'CUBE' && !this.isGrounded && this.canDoubleJump) {
+                    this.dy = JUMP_FORCE * this.gravity; // Normal jump force for double jump
+                    this.canDoubleJump = false;
+                    playSound('jump');
+                    // Visual feedback for double jump
+                    createParticles(this.x + this.size/2, this.y + this.size/2, '#00FFFF', 10);
+                }
+            }
+            
+            // Triggered by Orb
+            orbJump() {
+                // STRONGER ORB: Increased multiplier from default to 1.5
+                this.dy = (JUMP_FORCE * 1.5) * this.gravity;
+                this.isGrounded = false;
+                this.canDoubleJump = true; // Hitting orb refreshes double jump
+                playSound('jump');
+                createParticles(this.x + this.size/2, this.y + this.size/2, '#FFFF00', 10);
             }
 
             draw() {
@@ -714,18 +774,15 @@
                         t.alpha -= 0.05;
                         ctx.save();
                         ctx.translate(t.x + this.size / 2, t.y + this.size / 2);
+                        // Flip vertically if gravity inverted
+                        if (t.gravity === -1) ctx.scale(1, -1);
+                        
                         ctx.rotate(t.r * Math.PI / 180);
                         ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0, t.alpha)})`;
                         if (t.mode === 'SHIP') {
                              ctx.beginPath(); ctx.moveTo(-this.size/2, -this.size/4); ctx.lineTo(this.size/2, 0); ctx.lineTo(-this.size/2, this.size/4); ctx.fill();
                         } else if (t.mode === 'WAVE') {
-                             // FIXED: Thinner and shorter trail for wave
-                             ctx.beginPath(); 
-                             ctx.moveTo(-this.size/4, 0); 
-                             ctx.lineTo(this.size/4, 0); 
-                             ctx.strokeStyle = `rgba(255, 255, 255, ${Math.max(0, t.alpha)})`; 
-                             ctx.lineWidth = 3; 
-                             ctx.stroke();
+                             ctx.beginPath(); ctx.moveTo(-this.size/4, 0); ctx.lineTo(this.size/4, 0); ctx.strokeStyle = `rgba(255, 255, 255, ${Math.max(0, t.alpha)})`; ctx.lineWidth = 3; ctx.stroke();
                         } else {
                             ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
                         }
@@ -735,6 +792,9 @@
 
                 ctx.save();
                 ctx.translate(this.x + this.size / 2, this.y + this.size / 2);
+                // Flip player sprite if inverted gravity
+                if (this.gravity === -1) ctx.scale(1, -1);
+                
                 ctx.rotate(this.rotation * Math.PI / 180);
                 ctx.scale(this.scale, this.scale);
                 ctx.fillStyle = this.color;
@@ -747,20 +807,8 @@
                     ctx.beginPath(); ctx.moveTo(-this.size/2, -this.size/3); ctx.lineTo(this.size/2, 0); ctx.lineTo(-this.size/2, this.size/3); ctx.lineTo(-this.size/2, -this.size/3); ctx.fill();
                     ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.stroke(); ctx.fillStyle = '#00FFFF'; ctx.beginPath(); ctx.arc(-5, 0, 10, 0, Math.PI*2); ctx.fill();
                 } else if (this.mode === 'WAVE') {
-                    // FIXED: Made the wave arrow shorter and thinner
-                    ctx.beginPath(); 
-                    ctx.moveTo(-this.size/2, -this.size/6); // Thinner back
-                    ctx.lineTo(this.size/2, 0);             // Shorter tip (was size/2 + 15)
-                    ctx.lineTo(-this.size/2, this.size/6);  // Thinner back
-                    ctx.closePath(); ctx.fill();
-                    ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.stroke(); 
-                    
-                    // Inner Detail
-                    ctx.beginPath(); 
-                    ctx.moveTo(-this.size/2 + 10, -this.size/10); 
-                    ctx.lineTo(this.size/4, 0); 
-                    ctx.lineTo(-this.size/2 + 10, this.size/10); 
-                    ctx.fillStyle = '#00FFFF'; ctx.fill();
+                    ctx.beginPath(); ctx.moveTo(-this.size/2, -this.size/6); ctx.lineTo(this.size/2, 0); ctx.lineTo(-this.size/2, this.size/6); ctx.closePath(); ctx.fill();
+                    ctx.strokeStyle = '#000'; ctx.lineWidth = 3; ctx.stroke(); ctx.beginPath(); ctx.moveTo(-this.size/2 + 10, -this.size/10); ctx.lineTo(this.size/4, 0); ctx.lineTo(-this.size/2 + 10, this.size/10); ctx.fillStyle = '#00FFFF'; ctx.fill();
                 }
                 ctx.restore();
             }
@@ -777,7 +825,7 @@
                 
                 if (this.type === 'PAD') {
                     this.y = groundY - 15; this.h = 15;
-                } else if (this.type === 'COIN') {
+                } else if (this.type === 'COIN' || this.type === 'ORB_YELLOW') {
                     this.y = groundY - (def.y * GRID_SIZE) - GRID_SIZE;
                     this.bobOffset = Math.random() * 100;
                 } else if (this.type.startsWith('PORTAL')) {
@@ -801,36 +849,25 @@
                     let cx = screenX + this.w/2;
                     ctx.beginPath(); ctx.arc(cx, cy, 20, 0, Math.PI*2); ctx.fillStyle = '#FFD700'; ctx.fill(); ctx.strokeStyle = '#DAA520'; ctx.lineWidth = 3; ctx.stroke();
                     ctx.beginPath(); ctx.arc(cx, cy, 12, 0, Math.PI*2); ctx.strokeStyle = '#FFF'; ctx.stroke();
+                } else if (this.type === 'ORB_YELLOW') {
+                    // Yellow Jump Ring
+                    let cy = this.y + this.h/2;
+                    let cx = screenX + this.w/2;
+                    // Outer Ring
+                    ctx.beginPath(); ctx.arc(cx, cy, 22, 0, Math.PI*2); 
+                    ctx.fillStyle = 'rgba(255, 255, 0, 0.2)'; ctx.fill();
+                    ctx.strokeStyle = '#FFFF00'; ctx.lineWidth = 4; ctx.stroke();
+                    // Inner Ring
+                    ctx.beginPath(); ctx.arc(cx, cy, 16, 0, Math.PI*2); 
+                    ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2; ctx.stroke();
                 } else if (this.type === 'SPIKE') {
-                    ctx.beginPath(); 
-                    // REVERTED: Restored spike height (user wanted Wave changes, not spike changes)
-                    ctx.moveTo(screenX + 5, this.y + this.h); 
-                    ctx.lineTo(screenX + this.w / 2, this.y + 5); 
-                    ctx.lineTo(screenX + this.w - 5, this.y + this.h); 
-                    ctx.closePath();
+                    ctx.beginPath(); ctx.moveTo(screenX + 5, this.y + this.h); ctx.lineTo(screenX + this.w / 2, this.y + 5); ctx.lineTo(screenX + this.w - 5, this.y + this.h); ctx.closePath();
                     ctx.fillStyle = '#111'; ctx.fill(); ctx.strokeStyle = '#FFF'; ctx.lineWidth = 2; ctx.stroke();
-                    
-                    // Inner
-                    ctx.beginPath(); 
-                    ctx.moveTo(screenX + 15, this.y + this.h - 5); 
-                    ctx.lineTo(screenX + this.w / 2, this.y + 20); 
-                    ctx.lineTo(screenX + this.w - 15, this.y + this.h - 5); 
-                    ctx.fillStyle = '#000'; ctx.fill();
+                    ctx.beginPath(); ctx.moveTo(screenX + 15, this.y + this.h - 5); ctx.lineTo(screenX + this.w / 2, this.y + 20); ctx.lineTo(screenX + this.w - 15, this.y + this.h - 5); ctx.fillStyle = '#000'; ctx.fill();
                 } else if (this.type === 'SPIKE_TOP') {
-                    ctx.beginPath(); 
-                    // REVERTED: Restored top spike height
-                    ctx.moveTo(screenX + 5, this.y); 
-                    ctx.lineTo(screenX + this.w / 2, this.y + this.h - 5); 
-                    ctx.lineTo(screenX + this.w - 5, this.y); 
-                    ctx.closePath();
+                    ctx.beginPath(); ctx.moveTo(screenX + 5, this.y); ctx.lineTo(screenX + this.w / 2, this.y + this.h - 5); ctx.lineTo(screenX + this.w - 5, this.y); ctx.closePath();
                     ctx.fillStyle = '#111'; ctx.fill(); ctx.strokeStyle = '#FFF'; ctx.lineWidth = 2; ctx.stroke();
-                    
-                    // Inner
-                    ctx.beginPath(); 
-                    ctx.moveTo(screenX + 15, this.y + 5); 
-                    ctx.lineTo(screenX + this.w / 2, this.y + this.h - 20); 
-                    ctx.lineTo(screenX + this.w - 15, this.y + 5); 
-                    ctx.fillStyle = '#000'; ctx.fill();
+                    ctx.beginPath(); ctx.moveTo(screenX + 15, this.y + 5); ctx.lineTo(screenX + this.w / 2, this.y + this.h - 20); ctx.lineTo(screenX + this.w - 15, this.y + 5); ctx.fillStyle = '#000'; ctx.fill();
                 } else if (this.type === 'BLOCK') {
                     ctx.fillStyle = '#000'; ctx.fillRect(screenX, this.y, this.w, this.h);
                     ctx.strokeStyle = '#00FFFF'; ctx.lineWidth = 2; ctx.strokeRect(screenX, this.y, this.w, this.h);
@@ -842,6 +879,14 @@
                 } else if (this.type === 'PORTAL_WAVE') {
                     ctx.fillStyle = '#00FFFF'; ctx.fillRect(screenX, this.y, this.w, this.h); ctx.strokeStyle = '#FFF'; ctx.strokeRect(screenX, this.y, this.w, this.h);
                     ctx.beginPath(); ctx.moveTo(screenX + 10, this.y + 10); ctx.lineTo(screenX + 30, this.y + 40); ctx.lineTo(screenX + 10, this.y + 70); ctx.lineWidth = 3; ctx.stroke();
+                } else if (this.type === 'PORTAL_GRAVITY_UP') {
+                    ctx.fillStyle = '#FFD700'; ctx.fillRect(screenX, this.y, this.w, this.h); ctx.strokeStyle = '#FFF'; ctx.strokeRect(screenX, this.y, this.w, this.h);
+                    // Arrow Up
+                    ctx.beginPath(); ctx.moveTo(screenX + 20, this.y + 10); ctx.lineTo(screenX + 10, this.y + 30); ctx.lineTo(screenX + 30, this.y + 30); ctx.fill();
+                } else if (this.type === 'PORTAL_GRAVITY_DOWN') {
+                    ctx.fillStyle = '#2196F3'; ctx.fillRect(screenX, this.y, this.w, this.h); ctx.strokeStyle = '#FFF'; ctx.strokeRect(screenX, this.y, this.w, this.h);
+                    // Arrow Down
+                    ctx.beginPath(); ctx.moveTo(screenX + 20, this.y + 70); ctx.lineTo(screenX + 10, this.y + 50); ctx.lineTo(screenX + 30, this.y + 50); ctx.fill();
                 }
             }
         }
@@ -863,18 +908,39 @@
             }
         }
 
+        // Helper to check for nearby orbs to prioritize them over Double Jump
+        function isOverlappingOrb() {
+            // Check a wider area around the player for intention
+            const margin = 30; 
+            const p = { 
+                l: player.x + 12 - margin, 
+                r: player.x + player.size - 12 + margin, 
+                t: player.y + 12 - margin, 
+                b: player.y + player.size - 2 + margin 
+            };
+
+            for (let obs of activeObstacles) {
+                if (obs.type === 'ORB_YELLOW' && !obs.hasTriggered) {
+                     let screenX = obs.worldX - cameraX;
+                     if (screenX > width || screenX + obs.w < 0) continue;
+                     
+                     // Orbs have full hitbox for this check
+                     const o = { l: screenX, r: screenX + obs.w, t: obs.y, b: obs.y + obs.h };
+                     
+                     if (p.r > o.l && p.l < o.r && p.b > o.t && p.t < o.b) {
+                         return true;
+                     }
+                }
+            }
+            return false;
+        }
+
         function checkCollisions() {
             if (gameState !== 'PLAYING') return;
             
             let p;
             if (player.mode === 'WAVE') {
-                // FIXED: Adjusted hitbox for thinner/shorter wave
-                p = { 
-                    l: player.x + 15, 
-                    r: player.x + player.size - 15, 
-                    t: player.y + 20, 
-                    b: player.y + player.size - 20 
-                };
+                p = { l: player.x + 15, r: player.x + player.size - 15, t: player.y + 20, b: player.y + player.size - 20 };
             } else {
                 p = { l: player.x + 12, r: player.x + player.size - 12, t: player.y + 12, b: player.y + player.size - 2 };
             }
@@ -884,6 +950,7 @@
                 let screenX = obs.worldX - cameraX;
                 if (screenX > width || screenX + obs.w < 0) continue;
 
+                // Default Hitbox (shrunk slightly for blocks/spikes)
                 const o = { l: screenX + 5, r: screenX + obs.w - 5, t: obs.y + 5, b: obs.y + obs.h };
 
                 if (obs.type === 'COIN') {
@@ -893,14 +960,33 @@
                     continue; 
                 }
                 
+                // ORB LOGIC
+                if (obs.type === 'ORB_YELLOW') {
+                    // Use a larger, more forgiving hitbox for the actual activation
+                    const orbHitbox = { l: screenX, r: screenX + obs.w, t: obs.y, b: obs.y + obs.h };
+                    
+                    if (p.r > orbHitbox.l && p.l < orbHitbox.r && p.b > orbHitbox.t && p.t < orbHitbox.b) {
+                        if (isJumpHeld && !obs.hasTriggered) {
+                            player.orbJump();
+                            obs.hasTriggered = true;
+                            obs.w = 0; 
+                        }
+                    }
+                    continue;
+                }
+                
                 if (obs.type.startsWith('PORTAL')) {
                     if (p.r > o.l && p.l < o.r) {
                          if (!obs.hasTriggered) {
                              if (obs.type === 'PORTAL_SHIP') player.mode = 'SHIP';
                              if (obs.type === 'PORTAL_CUBE') player.mode = 'CUBE';
                              if (obs.type === 'PORTAL_WAVE') player.mode = 'WAVE';
+                             
+                             // Gravity Portals
+                             if (obs.type === 'PORTAL_GRAVITY_UP') player.gravity = -1;
+                             if (obs.type === 'PORTAL_GRAVITY_DOWN') player.gravity = 1;
+
                              playSound('portal');
-                             player.rotation = 0;
                              obs.hasTriggered = true;
                          }
                     }
@@ -918,9 +1004,6 @@
                         const penetrationX = Math.min(Math.abs(p.r - o.l), Math.abs(p.l - o.r));
 
                         if (player.mode === 'WAVE') {
-                            // Increased tolerance: +15 instead of +10
-                            // If strictly hitting side (PenetrationX < PenetrationY - 15) -> Die
-                            // Otherwise -> Slide
                             if (penetrationY < penetrationX + 15) {
                                 if (Math.abs(p.b - o.t) < Math.abs(p.t - o.b)) { // Hit Top
                                     player.y = obs.y - player.size;
@@ -934,21 +1017,51 @@
                             }
                         } 
                         else {
-                            // Cube landing logic
-                            // Increased tolerance from +15 to +20 to prevent "clipping" deaths on staircases
-                            if ((penetrationY < penetrationX + 20) && player.dy >= 0 && player.y + player.size < obs.y + 40) {
-                                player.isGrounded = true;
-                                player.dy = 0;
-                                player.y = obs.y - player.size;
-                                player.rotation = 0;
-                            } else {
-                                gameOver(); return;
+                            // CUBE / SHIP COLLISION
+                            // Normal Gravity: Land on Top
+                            if (player.gravity === 1) {
+                                if ((penetrationY < penetrationX + 20) && player.dy >= 0 && player.y + player.size < obs.y + 40) {
+                                    player.isGrounded = true;
+                                    player.canDoubleJump = true; // RESET Double Jump on block
+                                    player.dy = 0;
+                                    player.y = obs.y - player.size;
+                                    player.rotation = 0;
+                                } else {
+                                    // Hit head or side
+                                    if (player.mode === 'SHIP' && player.dy < 0 && Math.abs(p.t - o.b) < penetrationX) {
+                                        player.y = obs.y + obs.h;
+                                        player.dy = 0;
+                                    } else {
+                                        gameOver(); return;
+                                    }
+                                }
+                            } 
+                            // Inverted Gravity: Land on Bottom (Ceiling)
+                            else {
+                                let hitBottom = Math.abs(p.t - o.b) < Math.abs(p.b - o.t);
+                                
+                                if ((penetrationY < penetrationX + 20) && player.dy <= 0 && hitBottom) {
+                                    player.isGrounded = true;
+                                    player.canDoubleJump = true; // RESET Double Jump on ceiling block
+                                    player.dy = 0;
+                                    player.y = obs.y + obs.h; // Snap to bottom
+                                    player.rotation = 0;
+                                } else {
+                                    if (player.mode === 'SHIP' && player.dy > 0 && !hitBottom) {
+                                         player.y = obs.y - player.size;
+                                         player.dy = 0;
+                                    } else {
+                                        gameOver(); return;
+                                    }
+                                }
                             }
                         }
                     }
                 } else if (obs.type === 'PAD') {
                     if (p.r > o.l && p.l < o.r && p.b > o.t && p.t < o.b) {
-                        player.dy = -42; player.isGrounded = false; playSound('jump');
+                        player.dy = -42 * player.gravity; 
+                        player.isGrounded = false; playSound('jump');
+                        player.canDoubleJump = true; // Pads refresh double jump
                     }
                 }
             }
@@ -961,12 +1074,16 @@
         function loop() {
             if (gameState === 'PLAYING') {
                 cameraX += gameSpeed;
-                if (isJumpHeld) player.jump(); 
+                
+                // Continuous jump logic (Ground Only)
+                if (isJumpHeld) {
+                    player.jump(); // Will only jump if isGrounded is true
+                }
                 
                 // FIXED LOOP ORDER: Update (Phys) -> Collide (Correct) -> Trail (Record)
                 player.update();
                 checkCollisions();
-                player.updateTrail(); // Trail now records the corrected, smooth position
+                player.updateTrail(); 
 
                 let pct = Math.min(100, (cameraX / levelLength) * 100);
                 progressFill.style.width = `${pct}%`;
@@ -1224,8 +1341,16 @@
             if(e.target.closest('.interactive') || e.target.closest('#editor-ui') || e.target.closest('#editor-top-bar')) return;
             if (gameState === 'EDITOR') handleEditorClick(e);
             else {
-                if (!isJumpHeld && gameState === 'GAMEOVER') restartLevel();
-                else if (!isJumpHeld && gameState === 'COMPLETE') goToMenu();
+                if (!isJumpHeld) {
+                    if (gameState === 'GAMEOVER') restartLevel();
+                    else if (gameState === 'COMPLETE') goToMenu();
+                    else if (gameState === 'PLAYING') {
+                        // FIX: Only trigger Double Jump if NOT overlapping an orb
+                        if (!isOverlappingOrb()) {
+                            player.attemptAirJump(); 
+                        }
+                    }
+                }
                 isJumpHeld = true;
             }
         });
@@ -1235,8 +1360,16 @@
             if (e.code === 'ArrowLeft' && gameState === 'EDITOR') editorScrollX -= 20;
             if (e.code === 'Space' || e.code === 'ArrowUp') {
                 e.preventDefault();
-                if (!isJumpHeld && gameState === 'GAMEOVER') restartLevel();
-                else if (!isJumpHeld && gameState === 'COMPLETE') goToMenu();
+                if (!isJumpHeld) {
+                    if (gameState === 'GAMEOVER') restartLevel();
+                    else if (gameState === 'COMPLETE') goToMenu();
+                    else if (gameState === 'PLAYING') {
+                        // FIX: Only trigger Double Jump if NOT overlapping an orb
+                        if (!isOverlappingOrb()) {
+                            player.attemptAirJump(); 
+                        }
+                    }
+                }
                 isJumpHeld = true;
             }
         });
@@ -1246,8 +1379,16 @@
             e.preventDefault();
             if (gameState === 'EDITOR') handleEditorClick(e.touches[0]);
             else {
-                if (!isJumpHeld && gameState === 'GAMEOVER') restartLevel();
-                else if (!isJumpHeld && gameState === 'COMPLETE') goToMenu();
+                if (!isJumpHeld) {
+                    if (gameState === 'GAMEOVER') restartLevel();
+                    else if (gameState === 'COMPLETE') goToMenu();
+                    else if (gameState === 'PLAYING') {
+                        // FIX: Only trigger Double Jump if NOT overlapping an orb
+                        if (!isOverlappingOrb()) {
+                            player.attemptAirJump(); 
+                        }
+                    }
+                }
                 isJumpHeld = true;
             }
         }, {passive: false});
