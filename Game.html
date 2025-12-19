@@ -349,7 +349,7 @@
         function updateCoinDisplay() { coinDisplay.innerText = saveData.coins; }
 
         // Levels
-        const LEVELS_LIST = ['STEREO_MADNESS', 'BACK_ON_TRACK', 'SUPER_WAVE', 'CUSTOM'];
+        const LEVELS_LIST = ['STEREO_MADNESS', 'BACK_ON_TRACK', 'POLARGEIST', 'JUMPER', 'SUPER_WAVE', 'CUSTOM'];
         let currentLevelIndex = 0;
 
         const LEVELS = {
@@ -366,22 +366,17 @@
                 {x: 72, y: 0, type: 'SPIKE'}, {x: 72.5, y: 0, type: 'SPIKE'}, {x: 78, y: 0, type: 'PAD'},
                 {x: 80, y: 0, type: 'BLOCK'}, {x: 80, y: 1, type: 'BLOCK'}, {x: 80, y: 2, type: 'BLOCK'}, 
                 
-                // --- EXTENSION START ---
                 // Drop down section
                 {x: 85, y: 0, type: 'SPIKE'},
-                {x: 90, y: 0, type: 'BLOCK'}, {x: 90, y: 1, type: 'SPIKE'}, // Jump over spike on block
+                {x: 90, y: 0, type: 'BLOCK'}, {x: 90, y: 1, type: 'SPIKE'}, 
                 
                 // Staircase challenge
-                {x: 96, y: 0, type: 'BLOCK'}, 
-                {x: 98, y: 1, type: 'BLOCK'},
-                {x: 100, y: 2, type: 'BLOCK'},
-                {x: 102, y: 3, type: 'BLOCK'},
-                {x: 105, y: 0, type: 'PAD'}, // Save from the fall
+                {x: 96, y: 0, type: 'BLOCK'}, {x: 98, y: 1, type: 'BLOCK'},
+                {x: 100, y: 2, type: 'BLOCK'}, {x: 102, y: 3, type: 'BLOCK'},
+                {x: 105, y: 0, type: 'PAD'}, 
                 
                 // High jump
-                {x: 112, y: 4, type: 'BLOCK'}, 
-                {x: 115, y: 3, type: 'BLOCK'},
-                {x: 118, y: 2, type: 'BLOCK'},
+                {x: 112, y: 4, type: 'BLOCK'}, {x: 115, y: 3, type: 'BLOCK'}, {x: 118, y: 2, type: 'BLOCK'},
                 
                 // Tricky ground spikes
                 {x: 125, y: 0, type: 'SPIKE'}, {x: 126, y: 0, type: 'SPIKE'},
@@ -398,80 +393,129 @@
                 
                 {x: 20, y: 1, type: 'PORTAL_SHIP'},
                 
-                // Pillars inside tunnel
-                {x: 30, y: 1, type: 'BLOCK'}, {x: 30, y: 2, type: 'BLOCK'},
-                {x: 30, y: 9, type: 'BLOCK'}, {x: 30, y: 8, type: 'BLOCK'}, 
-                
-                {x: 35, y: 1, type: 'BLOCK'}, {x: 35, y: 2, type: 'BLOCK'}, {x: 35, y: 3, type: 'BLOCK'},
-                {x: 35, y: 9, type: 'BLOCK'},
-                
-                {x: 40, y: 1, type: 'BLOCK'},
-                {x: 40, y: 9, type: 'BLOCK'}, {x: 40, y: 8, type: 'BLOCK'}, {x: 40, y: 7, type: 'BLOCK'},
-
-                {x: 45, y: 1, type: 'BLOCK'}, {x: 45, y: 2, type: 'BLOCK'},
-                {x: 45, y: 9, type: 'BLOCK'}, {x: 45, y: 8, type: 'BLOCK'},
+                {x: 30, y: 1, type: 'BLOCK'}, {x: 30, y: 2, type: 'BLOCK'}, {x: 30, y: 9, type: 'BLOCK'}, {x: 30, y: 8, type: 'BLOCK'}, 
+                {x: 35, y: 1, type: 'BLOCK'}, {x: 35, y: 2, type: 'BLOCK'}, {x: 35, y: 3, type: 'BLOCK'}, {x: 35, y: 9, type: 'BLOCK'},
+                {x: 40, y: 1, type: 'BLOCK'}, {x: 40, y: 9, type: 'BLOCK'}, {x: 40, y: 8, type: 'BLOCK'}, {x: 40, y: 7, type: 'BLOCK'},
+                {x: 45, y: 1, type: 'BLOCK'}, {x: 45, y: 2, type: 'BLOCK'}, {x: 45, y: 9, type: 'BLOCK'}, {x: 45, y: 8, type: 'BLOCK'},
 
                 {x: 50, y: 5, type: 'COIN'},
                 {x: 60, y: 1, type: 'PORTAL_CUBE'},
                 
-                // Adjusted end section to prevent stuck spots
                 {x: 65, y: 0, type: 'BLOCK'}, {x: 65, y: 1, type: 'BLOCK'}, 
                 {x: 68, y: 0, type: 'PAD'},
 
                 {x: 70, y: 0, type: 'BLOCK'}, {x: 70, y: 1, type: 'BLOCK'}, {x: 70, y: 2, type: 'BLOCK'},
                 {x: 70, y: 3, type: 'BLOCK'}, {x: 70, y: 4, type: 'BLOCK'}, {x: 70, y: 5, type: 'BLOCK'},
                 
-                // --- EXTENSION START ---
                 {x: 75, y: 0, type: 'SPIKE'}, {x: 76, y: 0, type: 'SPIKE'},
                 
-                // Floating platforms
-                {x: 82, y: 2, type: 'BLOCK'},
-                {x: 85, y: 3, type: 'BLOCK'},
-                {x: 88, y: 4, type: 'BLOCK'},
-                {x: 91, y: 3, type: 'BLOCK'},
-                {x: 94, y: 2, type: 'BLOCK'},
+                // Coin 2 (Added)
+                {x: 82, y: 2, type: 'BLOCK'}, {x: 82, y: 4, type: 'COIN'},
+                {x: 85, y: 3, type: 'BLOCK'}, {x: 88, y: 4, type: 'BLOCK'}, {x: 91, y: 3, type: 'BLOCK'}, {x: 94, y: 2, type: 'BLOCK'},
                 
-                // Floor reset
                 {x: 100, y: 0, type: 'PAD'},
                 
-                // The "Hard" part - Pillar jumps
                 {x: 108, y: 0, type: 'BLOCK'}, {x: 108, y: 1, type: 'BLOCK'},
-                {x: 112, y: 0, type: 'BLOCK'}, {x: 112, y: 1, type: 'SPIKE'}, // Don't hit side
+                {x: 112, y: 0, type: 'BLOCK'}, {x: 112, y: 1, type: 'SPIKE'}, 
                 {x: 116, y: 0, type: 'BLOCK'}, {x: 116, y: 1, type: 'BLOCK'}, {x: 116, y: 2, type: 'BLOCK'},
                 
-                // Final Jump
+                // Coin 3 (Added)
+                {x: 120, y: 3, type: 'COIN'},
+                
                 {x: 125, y: 0, type: 'SPIKE'}, {x: 126, y: 0, type: 'SPIKE'}, {x: 127, y: 0, type: 'SPIKE'},
                 
-                // End Wall
                 {x: 145, y: 0, type: 'BLOCK'}, {x: 145, y: 1, type: 'BLOCK'}, {x: 145, y: 2, type: 'BLOCK'}
+            ],
+            'POLARGEIST': [
+                // Intro - Jump Pads
+                {x: 10, y: 0, type: 'PAD'},
+                {x: 15, y: 3, type: 'BLOCK'}, {x: 15, y: 4, type: 'BLOCK'},
+                {x: 20, y: 0, type: 'SPIKE'}, {x: 21, y: 0, type: 'SPIKE'},
+                {x: 25, y: 0, type: 'PAD'},
+                {x: 30, y: 4, type: 'BLOCK'}, {x: 30, y: 5, type: 'COIN'}, // Coin 1 (Jump high)
+                
+                // Drop
+                {x: 35, y: 0, type: 'SPIKE'},
+                {x: 40, y: 0, type: 'BLOCK'}, {x: 40, y: 1, type: 'BLOCK'},
+                {x: 45, y: 0, type: 'BLOCK'}, {x: 45, y: 1, type: 'SPIKE'},
+                
+                // Ship Section
+                {x: 55, y: 1, type: 'PORTAL_SHIP'},
+                {x: 65, y: 1, type: 'BLOCK'}, {x: 65, y: 8, type: 'BLOCK'},
+                {x: 75, y: 2, type: 'BLOCK'}, {x: 75, y: 7, type: 'BLOCK'},
+                {x: 85, y: 3, type: 'BLOCK'}, {x: 85, y: 6, type: 'BLOCK'}, {x: 85, y: 4, type: 'COIN'}, // Coin 2
+                
+                // Exit Ship
+                {x: 100, y: 1, type: 'PORTAL_CUBE'},
+                {x: 105, y: 0, type: 'BLOCK'}, {x: 105, y: 1, type: 'BLOCK'},
+                {x: 110, y: 0, type: 'PAD'},
+                {x: 118, y: 3, type: 'BLOCK'},
+                {x: 122, y: 0, type: 'SPIKE'}, {x: 123, y: 0, type: 'SPIKE'}, {x: 124, y: 0, type: 'SPIKE'},
+                
+                // Final tricky pads
+                {x: 130, y: 0, type: 'PAD'},
+                {x: 135, y: 4, type: 'BLOCK'},
+                {x: 138, y: 5, type: 'PAD'},
+                {x: 145, y: 7, type: 'COIN'}, // Coin 3 (High up)
+                {x: 150, y: 0, type: 'BLOCK'}
+            ],
+            'JUMPER': [
+                // Fast intro
+                {x: 10, y: 0, type: 'BLOCK'}, {x: 10, y: 1, type: 'SPIKE'},
+                {x: 15, y: 0, type: 'BLOCK'}, {x: 15, y: 1, type: 'BLOCK'},
+                {x: 20, y: 0, type: 'SPIKE'}, {x: 20.5, y: 0, type: 'SPIKE'},
+                
+                // Wave Section
+                {x: 30, y: 1, type: 'PORTAL_WAVE'},
+                {x: 40, y: 5, type: 'BLOCK'}, {x: 40, y: 4, type: 'BLOCK'},
+                {x: 50, y: 2, type: 'BLOCK'}, {x: 50, y: 7, type: 'BLOCK'},
+                {x: 60, y: 5, type: 'COIN'}, // Coin 1
+                {x: 70, y: 3, type: 'BLOCK'}, {x: 70, y: 6, type: 'BLOCK'},
+                
+                // Ship Section
+                {x: 85, y: 1, type: 'PORTAL_SHIP'},
+                {x: 95, y: 4, type: 'BLOCK'}, 
+                {x: 105, y: 5, type: 'BLOCK'}, {x: 105, y: 1, type: 'COIN'}, // Coin 2 (Low)
+                {x: 115, y: 3, type: 'BLOCK'},
+                
+                // Cube Finish
+                {x: 130, y: 1, type: 'PORTAL_CUBE'},
+                {x: 135, y: 0, type: 'BLOCK'}, {x: 135, y: 1, type: 'BLOCK'},
+                {x: 140, y: 0, type: 'SPIKE'}, {x: 141, y: 0, type: 'SPIKE'},
+                {x: 145, y: 2, type: 'BLOCK'}, {x: 145, y: 3, type: 'COIN'}, // Coin 3
+                {x: 150, y: 0, type: 'BLOCK'}
             ],
             'SUPER_WAVE': [
                 {x: 5, y: 1, type: 'PORTAL_WAVE'},
                 {x: 75, y: 5, type: 'COIN'},
-                {x: 250, y: 5, type: 'COIN'}, // New Coin near end
+                {x: 150, y: 5, type: 'COIN'}, // Coin 2 (Added)
+                {x: 250, y: 5, type: 'COIN'},
             ]
         };
 
-        // --- Generate Tunnel Borders for Back On Track ---
-        // EXTENDED: Ceiling now goes to x=150
+        // --- Generate Borders for Levels ---
+        
+        // BACK ON TRACK: Ceiling and partial floor
         for(let x = 0; x <= 150; x++) LEVELS['BACK_ON_TRACK'].push({x: x, y: 10, type: 'BLOCK'});
-        // Floor for ship section
         for(let x = 20; x <= 62; x++) LEVELS['BACK_ON_TRACK'].push({x: x, y: 0, type: 'BLOCK'});
 
-        // --- Generate Tunnel Borders for Super Wave ---
-        // EXTENDED: Length increased to 300
-        for(let x = 0; x <= 300; x++) {
+        // POLARGEIST: Borders
+        for(let x = 0; x <= 160; x++) LEVELS['POLARGEIST'].push({x: x, y: 10, type: 'BLOCK'}); // Ceiling
+        for(let x = 55; x <= 100; x++) LEVELS['POLARGEIST'].push({x: x, y: 0, type: 'BLOCK'}); // Floor for ship
+
+        // JUMPER: Borders
+        for(let x = 0; x <= 160; x++) LEVELS['JUMPER'].push({x: x, y: 10, type: 'BLOCK'}); // Ceiling
+        for(let x = 30; x <= 130; x++) LEVELS['JUMPER'].push({x: x, y: 0, type: 'BLOCK'}); // Floor for Wave/Ship
+
+        // SUPER WAVE: Procedural Generation
+        for(let x = 0; x <= 330; x++) {
             let floorHeight = 0;
             let ceilingHeight = 9;
 
-            if (x < 15) {
-                floorHeight = 0;
-                ceilingHeight = 9;
-            }
+            if (x < 15) { floorHeight = 0; ceilingHeight = 9; }
             else if (x < 50) {
                 if (x % 10 < 5) floorHeight = 0; else floorHeight = 1;
                 ceilingHeight = 8;
-                
                 if (x % 6 === 0) LEVELS['SUPER_WAVE'].push({x: x, y: floorHeight + 1, type: 'SPIKE'});
                 if (x % 6 === 3) LEVELS['SUPER_WAVE'].push({x: x, y: ceilingHeight - 1, type: 'SPIKE_TOP'});
             }
@@ -481,51 +525,36 @@
                 else if (phase < 8) { floorHeight = 2; ceilingHeight = 7; } 
                 else if (phase < 12) { floorHeight = 2 - ((phase - 8) * 0.5); ceilingHeight = 7 - ((phase - 8) * 0.5); } 
                 else { floorHeight = 0; ceilingHeight = 5; }
-
                 if (x % 2 === 0) {
                     LEVELS['SUPER_WAVE'].push({x: x, y: floorHeight + 1, type: 'SPIKE'});
                     LEVELS['SUPER_WAVE'].push({x: x, y: ceilingHeight - 1, type: 'SPIKE_TOP'});
                 }
             }
             else if (x < 160) {
-                floorHeight = 1; 
-                ceilingHeight = 6; 
+                floorHeight = 1; ceilingHeight = 6; 
                 if (x % 20 === 0) {
                     LEVELS['SUPER_WAVE'].push({x: x, y: 2, type: 'SPIKE'});
                     LEVELS['SUPER_WAVE'].push({x: x, y: 5, type: 'SPIKE_TOP'});
                 }
             }
-            // NEW SECTION: The Narrowing (160-250)
             else if (x < 250) {
-                // Zig Zag slowly
-                const weave = Math.sin(x * 0.1) * 2; // -2 to 2
-                floorHeight = 2 + weave;
-                ceilingHeight = 7 + weave;
-                
-                // Random Pillars
+                const weave = Math.sin(x * 0.1) * 2;
+                floorHeight = 2 + weave; ceilingHeight = 7 + weave;
                 if (x % 15 === 0) {
                      LEVELS['SUPER_WAVE'].push({x: x, y: Math.floor(floorHeight) + 1, type: 'BLOCK'});
                      LEVELS['SUPER_WAVE'].push({x: x, y: Math.floor(ceilingHeight) - 1, type: 'BLOCK'});
                 }
             }
-            // NEW SECTION: Final Sprint (250-300)
             else if (x < 300) {
-                floorHeight = 1;
-                ceilingHeight = 8;
-                // Lots of spikes
+                floorHeight = 1; ceilingHeight = 8;
                 if (x % 3 === 0) LEVELS['SUPER_WAVE'].push({x: x, y: 2, type: 'SPIKE'});
                 if (x % 3 === 1) LEVELS['SUPER_WAVE'].push({x: x, y: 7, type: 'SPIKE_TOP'});
             }
-            else {
-                floorHeight = 0;
-                ceilingHeight = 9;
-            }
+            else { floorHeight = 0; ceilingHeight = 10; }
 
             for(let y = 0; y <= floorHeight; y++) LEVELS['SUPER_WAVE'].push({x: x, y: y, type: 'BLOCK'});
             for(let y = ceilingHeight; y <= 12; y++) LEVELS['SUPER_WAVE'].push({x: x, y: y, type: 'BLOCK'});
         }
-        for(let y=0; y<12; y++) LEVELS['SUPER_WAVE'].push({x: 302, y: y, type: 'BLOCK'});
-
 
         // --- Audio ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -1004,6 +1033,8 @@
             menuLevelTitle.innerText = levelKey.replace(/_/g, ' ');
             if (levelKey === 'CUSTOM') menuLevelDiff.innerText = 'Difficulty: ???';
             else if (levelKey === 'BACK_ON_TRACK') menuLevelDiff.innerText = 'Difficulty: Hard';
+            else if (levelKey === 'POLARGEIST') menuLevelDiff.innerText = 'Difficulty: Harder';
+            else if (levelKey === 'JUMPER') menuLevelDiff.innerText = 'Difficulty: Harder';
             else if (levelKey === 'SUPER_WAVE') menuLevelDiff.innerText = 'Difficulty: Insane';
             else menuLevelDiff.innerText = 'Difficulty: Easy';
         }
