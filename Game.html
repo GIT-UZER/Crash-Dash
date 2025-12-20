@@ -1028,10 +1028,18 @@
                                     player.rotation = 0;
                                 } else {
                                     // Hit head or side
-                                    if (player.mode === 'SHIP' && player.dy < 0 && Math.abs(p.t - o.b) < penetrationX) {
-                                        player.y = obs.y + obs.h;
-                                        player.dy = 0;
+                                    // FIXED: Ship Ceiling Slide
+                                    // Check if we are physically hitting the bottom of the block (Ceiling)
+                                    // Condition: Vertical penetration is smaller than horizontal (meaning we hit Y face)
+                                    // AND we are closer to the bottom of the block than the top.
+                                    const verticalCollision = penetrationY < penetrationX;
+                                    const hittingCeiling = Math.abs(p.t - o.b) < Math.abs(p.b - o.t);
+
+                                    if (player.mode === 'SHIP' && verticalCollision && hittingCeiling) {
+                                        player.y = obs.y + obs.h; // Slide on ceiling
+                                        if (player.dy < 0) player.dy = 0; // Stop upward velocity
                                     } else {
+                                        // Wall hit or Cube Head Hit -> Death
                                         gameOver(); return;
                                     }
                                 }
@@ -1047,9 +1055,14 @@
                                     player.y = obs.y + obs.h; // Snap to bottom
                                     player.rotation = 0;
                                 } else {
-                                    if (player.mode === 'SHIP' && player.dy > 0 && !hitBottom) {
-                                         player.y = obs.y - player.size;
-                                         player.dy = 0;
+                                    // Hit head (ground/top of block) or side
+                                    // FIXED: Ship Floor Slide (Inverted)
+                                    const verticalCollision = penetrationY < penetrationX;
+                                    const hittingTop = !hitBottom;
+
+                                    if (player.mode === 'SHIP' && verticalCollision && hittingTop) {
+                                         player.y = obs.y - player.size; // Slide on floor
+                                         if (player.dy > 0) player.dy = 0;
                                     } else {
                                         gameOver(); return;
                                     }
