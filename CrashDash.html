@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Geometry Dash Clone</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Pusab&display=swap');
@@ -14,13 +14,28 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
             -webkit-user-select: none;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Game Container fills the screen */
+        #game-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            overflow: hidden;
         }
 
         canvas {
             display: block;
+            width: 100%;
+            height: 100%;
         }
 
-        /* UI Container */
+        /* UI Layer */
         #ui-layer {
             position: absolute;
             top: 0;
@@ -93,7 +108,7 @@
             padding: 20px;
             margin: 10px;
             border-radius: 10px;
-            width: 300px;
+            width: 400px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -134,7 +149,7 @@
         .editor-tool {
             width: 60px;
             height: 60px;
-            margin: 0 10px;
+            margin: 0 5px;
             border: 2px solid #555;
             cursor: pointer;
             display: flex;
@@ -142,8 +157,9 @@
             align-items: center;
             background: #222;
             color: white;
-            font-size: 12px;
+            font-size: 10px;
             font-weight: bold;
+            text-align: center;
         }
         .editor-tool.selected { border-color: #00FF00; background: #333; }
         
@@ -217,109 +233,122 @@
 </head>
 <body>
 
-    <!-- HUD -->
-    <div id="coin-hud"><div class="coin-icon"></div> <span id="coin-count">0</span></div>
-    <div id="progress-container"><div id="progress-fill"></div></div>
-    <div id="attempt-display">Attempt 1</div>
+    <div id="game-container">
+        <!-- HUD -->
+        <div id="coin-hud"><div class="coin-icon"></div> <span id="coin-count">0</span></div>
+        <div id="progress-container"><div id="progress-fill"></div></div>
+        <div id="attempt-display">Attempt 1</div>
 
-    <!-- Editor UI -->
-    <div id="editor-top-bar">
-        <button class="menu-btn orange" style="padding: 5px 20px; font-size: 16px;" onclick="exitEditor()">EXIT</button>
-        <div style="color:white; font-weight:bold;">LEVEL EDITOR</div>
-        <div>
-            <button class="menu-btn blue" style="padding: 5px 20px; font-size: 16px;" onclick="saveCustomLevel()">SAVE</button>
-            <button class="menu-btn" style="padding: 5px 20px; font-size: 16px;" onclick="testCustomLevel()">PLAY</button>
+        <!-- Editor UI -->
+        <div id="editor-top-bar">
+            <button class="menu-btn orange" style="padding: 5px 20px; font-size: 16px;" onclick="exitEditor()">EXIT</button>
+            <div style="color:white; font-weight:bold;">LEVEL EDITOR</div>
+            <div>
+                <button class="menu-btn blue" style="padding: 5px 20px; font-size: 16px;" onclick="saveCustomLevel()">SAVE</button>
+                <button class="menu-btn" style="padding: 5px 20px; font-size: 16px;" onclick="testCustomLevel()">PLAY</button>
+            </div>
         </div>
-    </div>
-    <div id="editor-ui">
-        <div class="editor-tool selected" onclick="selectTool('BLOCK')" id="tool-BLOCK">BLOCK</div>
-        <div class="editor-tool" onclick="selectTool('SPIKE')" id="tool-SPIKE">SPIKE</div>
-        <div class="editor-tool" onclick="selectTool('PAD')" id="tool-PAD">PAD</div>
-        <div class="editor-tool" onclick="selectTool('COIN')" id="tool-COIN">COIN</div>
-        <div class="editor-tool" onclick="selectTool('PORTAL_SHIP')" id="tool-PORTAL_SHIP" style="color:#FF00FF">SHIP</div>
-        <div class="editor-tool" onclick="selectTool('PORTAL_CUBE')" id="tool-PORTAL_CUBE" style="color:#00FF00">CUBE</div>
-        <div class="editor-tool" onclick="selectTool('PORTAL_WAVE')" id="tool-PORTAL_WAVE" style="color:#00FFFF">WAVE</div>
-        
-        <!-- NEW TOOLS -->
-        <div class="editor-tool" onclick="selectTool('ORB_YELLOW')" id="tool-ORB_YELLOW" style="color:#FFFF00; font-size:10px;">Y-ORB</div>
-        <div class="editor-tool" onclick="selectTool('PORTAL_GRAVITY_UP')" id="tool-PORTAL_GRAVITY_UP" style="color:#FFD700; font-size:9px;">G-UP</div>
-        <div class="editor-tool" onclick="selectTool('PORTAL_GRAVITY_DOWN')" id="tool-PORTAL_GRAVITY_DOWN" style="color:#2196F3; font-size:9px;">G-DOWN</div>
+        <div id="editor-ui">
+            <div class="editor-tool selected" onclick="selectTool('BLOCK')" id="tool-BLOCK">BLOCK</div>
+            <div class="editor-tool" onclick="selectTool('SPIKE')" id="tool-SPIKE">SPIKE</div>
+            <div class="editor-tool" onclick="selectTool('SPIKE_TOP')" id="tool-SPIKE_TOP">T-SPIKE</div>
+            <div class="editor-tool" onclick="selectTool('PAD')" id="tool-PAD">PAD</div>
+            <div class="editor-tool" onclick="selectTool('COIN')" id="tool-COIN">COIN</div>
+            <div class="editor-tool" onclick="selectTool('ORB_YELLOW')" id="tool-ORB_YELLOW" style="color:#FFFF00;">ORB</div>
+            <div class="editor-tool" onclick="selectTool('PORTAL_SHIP')" id="tool-PORTAL_SHIP" style="color:#FF00FF">SHIP</div>
+            <div class="editor-tool" onclick="selectTool('PORTAL_CUBE')" id="tool-PORTAL_CUBE" style="color:#00FF00">CUBE</div>
+            <div class="editor-tool" onclick="selectTool('PORTAL_WAVE')" id="tool-PORTAL_WAVE" style="color:#00FFFF">WAVE</div>
+            <div class="editor-tool" onclick="selectTool('PORTAL_GRAVITY_UP')" id="tool-PORTAL_GRAVITY_UP" style="color:#FFD700; font-size:9px;">G-UP</div>
+            <div class="editor-tool" onclick="selectTool('PORTAL_GRAVITY_DOWN')" id="tool-PORTAL_GRAVITY_DOWN" style="color:#2196F3; font-size:9px;">G-DOWN</div>
+            <div class="editor-tool" onclick="selectTool('ERASER')" id="tool-ERASER" style="border-color: red;">ERASE</div>
+        </div>
 
-        <div class="editor-tool" onclick="selectTool('ERASER')" id="tool-ERASER" style="border-color: red;">ERASE</div>
-    </div>
-
-    <div id="ui-layer">
-        <!-- Main Menu -->
-        <div id="menu-screen" class="interactive">
-            <div class="title">GEOMETRY DASH</div>
-            <div class="level-card" id="level-select" style="display:block;">
-                <div style="display:flex; align-items:center; width:100%; justify-content:space-between;">
-                    <button class="level-nav-btn" onclick="prevLevel()">&lt;</button>
-                    <div style="text-align:center;">
-                        <div class="level-title" id="menu-level-title">STEREO MADNESS</div>
-                        <div style="color: #aaa; font-size:14px;" id="menu-level-diff">Difficulty: Easy</div>
+        <div id="ui-layer">
+            <!-- Main Menu -->
+            <div id="menu-screen" class="interactive">
+                <div class="title">CRASH DASH</div>
+                <div class="level-card" id="level-select" style="display:block;">
+                    <div style="display:flex; align-items:center; width:100%; justify-content:space-between;">
+                        <button class="level-nav-btn" onclick="prevLevel()">&lt;</button>
+                        <div style="text-align:center;">
+                            <div class="level-title" id="menu-level-title">STEREO MADNESS</div>
+                            <div style="color: #aaa; font-size:14px;" id="menu-level-diff">Difficulty: Easy</div>
+                        </div>
+                        <button class="level-nav-btn" onclick="nextLevel()">&gt;</button>
                     </div>
-                    <button class="level-nav-btn" onclick="nextLevel()">&gt;</button>
+                    <br>
+                    <button class="menu-btn" onclick="startCurrentLevel()">PLAY</button>
                 </div>
                 <br>
-                <button class="menu-btn" onclick="startCurrentLevel()">PLAY</button>
+                <div>
+                    <button class="menu-btn purple" onclick="openEditor()">CREATE</button>
+                    <button class="menu-btn blue" onclick="openShop()">SHOP</button>
+                </div>
             </div>
-            <br>
-            <div>
-                <button class="menu-btn purple" onclick="openEditor()">CREATE</button>
-                <button class="menu-btn blue" onclick="openShop()">SHOP</button>
+
+            <!-- Shop Screen -->
+            <div id="shop-screen" class="interactive">
+                <div class="title" style="font-size: 40px;">COLOR SHOP</div>
+                <div class="shop-grid" id="shop-grid"></div>
+                <button class="menu-btn" onclick="closeShop()">BACK</button>
             </div>
+
+            <!-- Level Complete Screen -->
+            <div id="complete-screen" class="interactive">
+                <div class="title" style="color: #00FF00; font-size: 40px;">LEVEL COMPLETE!</div>
+                <div style="color: white; font-size: 20px; margin-bottom: 20px;" id="level-stats"></div>
+                <button class="menu-btn" onclick="startCurrentLevel()">REPLAY</button>
+                <button class="menu-btn orange" onclick="goToMenu()">MENU</button>
+            </div>
+
+            <button id="back-btn" class="menu-btn interactive" onclick="goToMenu()">MENU</button>
+            <div class="message" id="game-msg">CRASHED!</div>
         </div>
 
-        <!-- Shop Screen -->
-        <div id="shop-screen" class="interactive">
-            <div class="title" style="font-size: 40px;">COLOR SHOP</div>
-            <div class="shop-grid" id="shop-grid"></div>
-            <button class="menu-btn" onclick="closeShop()">BACK</button>
-        </div>
-
-        <!-- Level Complete Screen -->
-        <div id="complete-screen" class="interactive">
-            <div class="title" style="color: #00FF00; font-size: 40px;">LEVEL COMPLETE!</div>
-            <div style="color: white; font-size: 20px; margin-bottom: 20px;" id="level-stats"></div>
-            <button class="menu-btn" onclick="startCurrentLevel()">REPLAY</button>
-            <button class="menu-btn orange" onclick="goToMenu()">MENU</button>
-        </div>
-
-        <button id="back-btn" class="menu-btn interactive" onclick="goToMenu()">MENU</button>
-        <div class="message" id="game-msg">CRASHED!</div>
+        <canvas id="gameCanvas"></canvas>
     </div>
-
-    <canvas id="gameCanvas"></canvas>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const container = document.getElementById('game-container');
         
-        // UI
-        const uiMenu = document.getElementById('menu-screen');
-        const uiShop = document.getElementById('shop-screen');
-        const uiComplete = document.getElementById('complete-screen');
-        const uiMsg = document.getElementById('game-msg');
-        const editorUI = document.getElementById('editor-ui');
-        const editorTop = document.getElementById('editor-top-bar');
-        const coinDisplay = document.getElementById('coin-count');
-        const shopGrid = document.getElementById('shop-grid');
-        const progressBar = document.getElementById('progress-container');
-        const progressFill = document.getElementById('progress-fill');
-        const backBtn = document.getElementById('back-btn');
-        const attemptDisplay = document.getElementById('attempt-display');
-        const menuLevelTitle = document.getElementById('menu-level-title');
-        const menuLevelDiff = document.getElementById('menu-level-diff');
+        // --- GAME VARIABLES ---
+        let width = 1280;
+        let height = 720;
+        let groundY = height - 150;
+        const GRID_SIZE = 60;
+        
+        // --- RESPONSIVE SCALING ---
+        function resize() {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            
+            width = (w && w > 0) ? w : 1280;
+            height = (h && h > 0) ? h : 720;
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            let oldGroundY = groundY;
+            groundY = height - 150; 
+            
+            let deltaY = 0;
+            if (oldGroundY !== undefined) {
+                deltaY = groundY - oldGroundY;
+            }
 
-        let width, height, groundY;
+            if (player) player.y += deltaY;
+            if (activeObstacles.length > 0) activeObstacles.forEach(o => o.recalculateY());
+        }
+        
+        // Constants
         const GRAVITY = 1.9;
         const SHIP_GRAVITY = 0.5;
         const JUMP_FORCE = -22; 
         const SHIP_LIFT = -0.8;
         const GAME_SPEED_DEFAULT = 9.0;
-        const WAVE_SPEED = 5.5; // Reduced from 9.0 for a flatter angle (approx 30 deg)
-        const GRID_SIZE = 60;
+        const WAVE_SPEED = 5.5; 
 
         // State
         let gameState = 'MENU'; 
@@ -352,10 +381,27 @@
             localStorage.setItem('gd_clone_save_v2', JSON.stringify(saveData));
             updateCoinDisplay();
         }
-        function updateCoinDisplay() { coinDisplay.innerText = saveData.coins; }
+        
+        // UI Refs
+        const coinDisplay = document.getElementById('coin-count');
+        const uiMenu = document.getElementById('menu-screen');
+        const uiShop = document.getElementById('shop-screen');
+        const uiComplete = document.getElementById('complete-screen');
+        const uiMsg = document.getElementById('game-msg');
+        const editorUI = document.getElementById('editor-ui');
+        const editorTop = document.getElementById('editor-top-bar');
+        const shopGrid = document.getElementById('shop-grid');
+        const progressBar = document.getElementById('progress-container');
+        const progressFill = document.getElementById('progress-fill');
+        const backBtn = document.getElementById('back-btn');
+        const attemptDisplay = document.getElementById('attempt-display');
+        const menuLevelTitle = document.getElementById('menu-level-title');
+        const menuLevelDiff = document.getElementById('menu-level-diff');
+
+        function updateCoinDisplay() { if(coinDisplay) coinDisplay.innerText = saveData.coins; }
 
         // Levels
-        const LEVELS_LIST = ['STEREO_MADNESS', 'BACK_ON_TRACK', 'POLARGEIST', 'JUMPER', 'SUPER_WAVE', 'CUSTOM'];
+        const LEVELS_LIST = ['STEREO_MADNESS', 'BACK_ON_TRACK', 'JUMPER', 'SUPER_WAVE', 'CUSTOM'];
         let currentLevelIndex = 0;
 
         const LEVELS = {
@@ -371,23 +417,10 @@
                 {x: 58, y: 0, type: 'SPIKE'}, {x: 62, y: 2, type: 'BLOCK'}, {x: 65, y: 3, type: 'BLOCK'}, {x: 68, y: 2, type: 'BLOCK'}, {x: 68, y: 4, type: 'COIN'},
                 {x: 72, y: 0, type: 'SPIKE'}, {x: 72.5, y: 0, type: 'SPIKE'}, {x: 78, y: 0, type: 'PAD'},
                 {x: 80, y: 0, type: 'BLOCK'}, {x: 80, y: 1, type: 'BLOCK'}, {x: 80, y: 2, type: 'BLOCK'}, 
-                
-                // Drop down section
-                {x: 85, y: 0, type: 'SPIKE'},
-                {x: 90, y: 0, type: 'BLOCK'}, {x: 90, y: 1, type: 'SPIKE'}, 
-                
                 // Staircase challenge
                 {x: 96, y: 0, type: 'BLOCK'}, {x: 98, y: 1, type: 'BLOCK'},
                 {x: 100, y: 2, type: 'BLOCK'}, {x: 102, y: 3, type: 'BLOCK'},
                 {x: 105, y: 0, type: 'PAD'}, 
-                
-                // High jump
-                {x: 112, y: 4, type: 'BLOCK'}, {x: 115, y: 3, type: 'BLOCK'}, {x: 118, y: 2, type: 'BLOCK'},
-                
-                // Tricky ground spikes
-                {x: 125, y: 0, type: 'SPIKE'}, {x: 126, y: 0, type: 'SPIKE'},
-                {x: 130, y: 0, type: 'BLOCK'}, {x: 130, y: 1, type: 'SPIKE'},
-                
                 // Final Wall
                 {x: 138, y: 0, type: 'BLOCK'}, {x: 138, y: 1, type: 'BLOCK'}, {x: 138, y: 2, type: 'BLOCK'},
                 {x: 140, y: 0, type: 'BLOCK'}, {x: 140, y: 1, type: 'BLOCK'}, {x: 140, y: 2, type: 'BLOCK'}
@@ -396,74 +429,26 @@
                 {x: 5, y: 0, type: 'PAD'},
                 {x: 10, y: 0, type: 'BLOCK'}, {x: 10, y: 1, type: 'BLOCK'},
                 {x: 15, y: 0, type: 'SPIKE'}, {x: 16, y: 0, type: 'SPIKE'},
-                
                 {x: 20, y: 1, type: 'PORTAL_SHIP'},
-                
                 {x: 30, y: 1, type: 'BLOCK'}, {x: 30, y: 2, type: 'BLOCK'}, {x: 30, y: 9, type: 'BLOCK'}, {x: 30, y: 8, type: 'BLOCK'}, 
                 {x: 35, y: 1, type: 'BLOCK'}, {x: 35, y: 2, type: 'BLOCK'}, {x: 35, y: 3, type: 'BLOCK'}, {x: 35, y: 9, type: 'BLOCK'},
                 {x: 40, y: 1, type: 'BLOCK'}, {x: 40, y: 9, type: 'BLOCK'}, {x: 40, y: 8, type: 'BLOCK'}, {x: 40, y: 7, type: 'BLOCK'},
                 {x: 45, y: 1, type: 'BLOCK'}, {x: 45, y: 2, type: 'BLOCK'}, {x: 45, y: 9, type: 'BLOCK'}, {x: 45, y: 8, type: 'BLOCK'},
-
                 {x: 50, y: 5, type: 'COIN'},
                 {x: 60, y: 1, type: 'PORTAL_CUBE'},
-                
                 {x: 65, y: 0, type: 'BLOCK'}, {x: 65, y: 1, type: 'BLOCK'}, 
                 {x: 68, y: 0, type: 'PAD'},
-
-                {x: 70, y: 0, type: 'BLOCK'}, {x: 70, y: 1, type: 'BLOCK'}, {x: 70, y: 2, type: 'BLOCK'},
-                {x: 70, y: 3, type: 'BLOCK'}, {x: 70, y: 4, type: 'BLOCK'}, {x: 70, y: 5, type: 'BLOCK'},
                 
-                {x: 75, y: 0, type: 'SPIKE'}, {x: 76, y: 0, type: 'SPIKE'},
+                // FIXED: Moved this wall back from 70 to 72 to prevent clipping after the jump pad
+                {x: 72, y: 0, type: 'BLOCK'}, {x: 72, y: 1, type: 'BLOCK'}, {x: 72, y: 2, type: 'BLOCK'},
+                {x: 72, y: 3, type: 'BLOCK'}, {x: 72, y: 4, type: 'BLOCK'}, {x: 72, y: 5, type: 'BLOCK'},
                 
-                // Coin 2 (Added)
+                {x: 78, y: 0, type: 'SPIKE'}, {x: 79, y: 0, type: 'SPIKE'},
                 {x: 82, y: 2, type: 'BLOCK'}, {x: 82, y: 4, type: 'COIN'},
                 {x: 85, y: 3, type: 'BLOCK'}, {x: 88, y: 4, type: 'BLOCK'}, {x: 91, y: 3, type: 'BLOCK'}, {x: 94, y: 2, type: 'BLOCK'},
-                
                 {x: 100, y: 0, type: 'PAD'},
-                
-                {x: 108, y: 0, type: 'BLOCK'}, {x: 108, y: 1, type: 'BLOCK'},
-                {x: 112, y: 0, type: 'BLOCK'}, {x: 112, y: 1, type: 'SPIKE'}, 
-                {x: 116, y: 0, type: 'BLOCK'}, {x: 116, y: 1, type: 'BLOCK'}, {x: 116, y: 2, type: 'BLOCK'},
-                
-                // Coin 3 (Added)
                 {x: 120, y: 3, type: 'COIN'},
-                
-                {x: 125, y: 0, type: 'SPIKE'}, {x: 126, y: 0, type: 'SPIKE'}, {x: 127, y: 0, type: 'SPIKE'},
-                
                 {x: 145, y: 0, type: 'BLOCK'}, {x: 145, y: 1, type: 'BLOCK'}, {x: 145, y: 2, type: 'BLOCK'}
-            ],
-            'POLARGEIST': [
-                // Intro - Jump Pads
-                {x: 10, y: 0, type: 'PAD'},
-                {x: 15, y: 3, type: 'BLOCK'}, {x: 15, y: 4, type: 'BLOCK'},
-                {x: 20, y: 0, type: 'SPIKE'}, {x: 21, y: 0, type: 'SPIKE'},
-                {x: 25, y: 0, type: 'PAD'},
-                {x: 30, y: 4, type: 'BLOCK'}, {x: 30, y: 5, type: 'COIN'}, // Coin 1 (Jump high)
-                
-                // Drop
-                {x: 35, y: 0, type: 'SPIKE'},
-                {x: 40, y: 0, type: 'BLOCK'}, {x: 40, y: 1, type: 'BLOCK'},
-                {x: 45, y: 0, type: 'BLOCK'}, {x: 45, y: 1, type: 'SPIKE'},
-                
-                // Ship Section
-                {x: 55, y: 1, type: 'PORTAL_SHIP'},
-                {x: 65, y: 1, type: 'BLOCK'}, {x: 65, y: 8, type: 'BLOCK'},
-                {x: 75, y: 2, type: 'BLOCK'}, {x: 75, y: 7, type: 'BLOCK'},
-                {x: 85, y: 3, type: 'BLOCK'}, {x: 85, y: 6, type: 'BLOCK'}, {x: 85, y: 4, type: 'COIN'}, // Coin 2
-                
-                // Exit Ship
-                {x: 100, y: 1, type: 'PORTAL_CUBE'},
-                {x: 105, y: 0, type: 'BLOCK'}, {x: 105, y: 1, type: 'BLOCK'},
-                {x: 110, y: 0, type: 'PAD'},
-                {x: 118, y: 3, type: 'BLOCK'},
-                {x: 122, y: 0, type: 'SPIKE'}, {x: 123, y: 0, type: 'SPIKE'}, {x: 124, y: 0, type: 'SPIKE'},
-                
-                // Final tricky pads
-                {x: 130, y: 0, type: 'PAD'},
-                {x: 135, y: 4, type: 'BLOCK'},
-                {x: 138, y: 5, type: 'PAD'},
-                {x: 145, y: 7, type: 'COIN'}, // Coin 3 (High up)
-                {x: 150, y: 0, type: 'BLOCK'}
             ],
             'JUMPER': [
                 // Fast intro
@@ -478,13 +463,15 @@
                 
                 // GRAVITY FLIP
                 {x: 45, y: 5, type: 'PORTAL_GRAVITY_UP'},
-                {x: 50, y: 9, type: 'BLOCK'}, {x: 50, y: 8, type: 'SPIKE_TOP'}, // Upside down logic
-                {x: 55, y: 9, type: 'BLOCK'}, {x: 55, y: 8, type: 'BLOCK'},
+                
+                // FIXED: Moved these obstacles from x=50 to x=58 to prevent instant crash
+                {x: 58, y: 9, type: 'BLOCK'}, {x: 58, y: 8, type: 'SPIKE_TOP'}, 
+                {x: 62, y: 9, type: 'BLOCK'}, {x: 62, y: 8, type: 'BLOCK'},
                 
                 // UPSIDE DOWN SHIP
                 {x: 65, y: 5, type: 'PORTAL_SHIP'},
                 {x: 75, y: 2, type: 'BLOCK'}, {x: 75, y: 7, type: 'BLOCK'},
-                {x: 85, y: 5, type: 'COIN'}, // Coin while upside down flying
+                {x: 85, y: 5, type: 'COIN'}, 
                 
                 // FLIP BACK
                 {x: 95, y: 5, type: 'PORTAL_GRAVITY_DOWN'},
@@ -499,20 +486,16 @@
             'SUPER_WAVE': [
                 {x: 5, y: 1, type: 'PORTAL_WAVE'},
                 {x: 75, y: 5, type: 'COIN'},
-                {x: 150, y: 5, type: 'COIN'}, // Coin 2 (Added)
+                {x: 150, y: 5, type: 'COIN'}, 
                 {x: 250, y: 5, type: 'COIN'},
             ]
         };
 
-        // --- Generate Borders for Levels ---
+        // --- Generate Tunnel Borders ---
         
         // BACK ON TRACK: Ceiling and partial floor
         for(let x = 0; x <= 150; x++) LEVELS['BACK_ON_TRACK'].push({x: x, y: 10, type: 'BLOCK'});
         for(let x = 20; x <= 62; x++) LEVELS['BACK_ON_TRACK'].push({x: x, y: 0, type: 'BLOCK'});
-
-        // POLARGEIST: Borders
-        for(let x = 0; x <= 160; x++) LEVELS['POLARGEIST'].push({x: x, y: 10, type: 'BLOCK'}); // Ceiling
-        for(let x = 55; x <= 100; x++) LEVELS['POLARGEIST'].push({x: x, y: 0, type: 'BLOCK'}); // Floor for ship
 
         // JUMPER: Borders
         for(let x = 0; x <= 160; x++) LEVELS['JUMPER'].push({x: x, y: 10, type: 'BLOCK'}); // Ceiling
@@ -570,7 +553,6 @@
         // --- Audio ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
-        let musicInterval = null;
 
         function playSound(type) {
             if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -634,8 +616,6 @@
                 this.scale = 1.0;
                 this.mode = 'CUBE'; 
                 this.gravity = 1; // 1 = Normal, -1 = Upside Down
-                
-                // NEW: Double jump state
                 this.canDoubleJump = true;
             }
 
@@ -662,17 +642,14 @@
                         this.dy += SHIP_GRAVITY * this.gravity;
                         if (isJumpHeld) this.dy += SHIP_LIFT * this.gravity;
                         
-                        // Velocity clamping
                         if (this.dy > 10) this.dy = 10;
                         if (this.dy < -10) this.dy = -10;
                         
                         this.y += this.dy;
                         this.rotation = this.dy * 2 * this.gravity;
                     } else if (this.mode === 'WAVE') {
-                        // Wave isn't usually affected by gravity portals in the same way (it flips its own gravity)
-                        // But for consistency we can flip the controls
                         let thrust = isJumpHeld;
-                        if(this.gravity === -1) thrust = !thrust; // Invert controls for upside down wave
+                        if(this.gravity === -1) thrust = !thrust; 
 
                         if (thrust) {
                             this.dy = -WAVE_SPEED; 
@@ -685,7 +662,6 @@
                     }
 
                     // Floor/Ceiling Collision (Global Boundaries)
-                    // Normal Gravity: Floor is groundY
                     if (this.gravity === 1) {
                         if (this.mode === 'WAVE') {
                              if (this.y > groundY - this.size) { this.y = groundY - this.size; this.rotation = 0; }
@@ -695,10 +671,10 @@
                                 this.y = groundY - this.size;
                                 this.dy = 0;
                                 this.isGrounded = true;
-                                this.canDoubleJump = true; // RESET Double Jump on floor
+                                this.canDoubleJump = true; 
                                 if (this.mode === 'SHIP') this.rotation = 0;
                             }
-                            if (this.y < -500) { // High ceiling cap
+                            if (this.y < -500) { 
                                 this.y = -500;
                                 if (this.dy < 0) this.dy = 0;
                             }
@@ -706,14 +682,9 @@
                     } 
                     // Upside Down Gravity
                     else {
-                        if (this.y < -100) { 
-                             // Cap
-                        }
-                        if (this.y > groundY + 100) { 
-                             // Cap
-                        }
+                        if (this.y < -100) { /* cap */ }
+                        if (this.y > groundY + 100) { /* cap */ }
                         
-                        // Wave Clamping Inverted
                         if (this.mode === 'WAVE') {
                              if (this.y > groundY - this.size) { this.y = groundY - this.size; this.rotation = 0; }
                              if (this.y < 0) { this.y = 0; this.rotation = 0; }
@@ -735,7 +706,6 @@
             }
 
             jump() {
-                // Regular Jump (Ground only)
                 if (this.mode === 'CUBE' && this.isGrounded) {
                     this.dy = JUMP_FORCE * this.gravity;
                     this.isGrounded = false;
@@ -743,23 +713,19 @@
                 }
             }
             
-            // NEW: Separate method for mid-air jumps (triggered by distinct press)
             attemptAirJump() {
                 if (this.mode === 'CUBE' && !this.isGrounded && this.canDoubleJump) {
-                    this.dy = JUMP_FORCE * this.gravity; // Normal jump force for double jump
+                    this.dy = JUMP_FORCE * this.gravity; 
                     this.canDoubleJump = false;
                     playSound('jump');
-                    // Visual feedback for double jump
                     createParticles(this.x + this.size/2, this.y + this.size/2, '#00FFFF', 10);
                 }
             }
             
-            // Triggered by Orb
             orbJump() {
-                // STRONGER ORB: Increased multiplier from default to 1.5
                 this.dy = (JUMP_FORCE * 1.5) * this.gravity;
                 this.isGrounded = false;
-                this.canDoubleJump = true; // Hitting orb refreshes double jump
+                this.canDoubleJump = true; 
                 playSound('jump');
                 createParticles(this.x + this.size/2, this.y + this.size/2, '#FFFF00', 10);
             }
@@ -774,7 +740,6 @@
                         t.alpha -= 0.05;
                         ctx.save();
                         ctx.translate(t.x + this.size / 2, t.y + this.size / 2);
-                        // Flip vertically if gravity inverted
                         if (t.gravity === -1) ctx.scale(1, -1);
                         
                         ctx.rotate(t.r * Math.PI / 180);
@@ -792,7 +757,6 @@
 
                 ctx.save();
                 ctx.translate(this.x + this.size / 2, this.y + this.size / 2);
-                // Flip player sprite if inverted gravity
                 if (this.gravity === -1) ctx.scale(1, -1);
                 
                 ctx.rotate(this.rotation * Math.PI / 180);
@@ -816,24 +780,29 @@
 
         class Obstacle {
             constructor(def) {
+                this.def = def; // Store definition for resize recalculation
+                this.gridY = def.y;
                 this.worldX = def.x * GRID_SIZE;
                 this.type = def.type;
                 this.w = GRID_SIZE;
                 this.h = GRID_SIZE;
                 this.collected = false;
                 this.hasTriggered = false; 
-                
+                this.recalculateY();
+            }
+
+            recalculateY() {
                 if (this.type === 'PAD') {
                     this.y = groundY - 15; this.h = 15;
                 } else if (this.type === 'COIN' || this.type === 'ORB_YELLOW') {
-                    this.y = groundY - (def.y * GRID_SIZE) - GRID_SIZE;
+                    this.y = groundY - (this.gridY * GRID_SIZE) - GRID_SIZE;
                     this.bobOffset = Math.random() * 100;
                 } else if (this.type.startsWith('PORTAL')) {
-                    this.y = groundY - (def.y * GRID_SIZE) - 80; 
+                    this.y = groundY - (this.gridY * GRID_SIZE) - 80; 
                     this.h = 80;
                     this.w = 40;
                 } else {
-                    this.y = groundY - (def.y * GRID_SIZE) - this.h;
+                    this.y = groundY - (this.gridY * GRID_SIZE) - this.h;
                 }
             }
 
@@ -850,14 +819,11 @@
                     ctx.beginPath(); ctx.arc(cx, cy, 20, 0, Math.PI*2); ctx.fillStyle = '#FFD700'; ctx.fill(); ctx.strokeStyle = '#DAA520'; ctx.lineWidth = 3; ctx.stroke();
                     ctx.beginPath(); ctx.arc(cx, cy, 12, 0, Math.PI*2); ctx.strokeStyle = '#FFF'; ctx.stroke();
                 } else if (this.type === 'ORB_YELLOW') {
-                    // Yellow Jump Ring
                     let cy = this.y + this.h/2;
                     let cx = screenX + this.w/2;
-                    // Outer Ring
                     ctx.beginPath(); ctx.arc(cx, cy, 22, 0, Math.PI*2); 
                     ctx.fillStyle = 'rgba(255, 255, 0, 0.2)'; ctx.fill();
                     ctx.strokeStyle = '#FFFF00'; ctx.lineWidth = 4; ctx.stroke();
-                    // Inner Ring
                     ctx.beginPath(); ctx.arc(cx, cy, 16, 0, Math.PI*2); 
                     ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 2; ctx.stroke();
                 } else if (this.type === 'SPIKE') {
@@ -881,11 +847,9 @@
                     ctx.beginPath(); ctx.moveTo(screenX + 10, this.y + 10); ctx.lineTo(screenX + 30, this.y + 40); ctx.lineTo(screenX + 10, this.y + 70); ctx.lineWidth = 3; ctx.stroke();
                 } else if (this.type === 'PORTAL_GRAVITY_UP') {
                     ctx.fillStyle = '#FFD700'; ctx.fillRect(screenX, this.y, this.w, this.h); ctx.strokeStyle = '#FFF'; ctx.strokeRect(screenX, this.y, this.w, this.h);
-                    // Arrow Up
                     ctx.beginPath(); ctx.moveTo(screenX + 20, this.y + 10); ctx.lineTo(screenX + 10, this.y + 30); ctx.lineTo(screenX + 30, this.y + 30); ctx.fill();
                 } else if (this.type === 'PORTAL_GRAVITY_DOWN') {
                     ctx.fillStyle = '#2196F3'; ctx.fillRect(screenX, this.y, this.w, this.h); ctx.strokeStyle = '#FFF'; ctx.strokeRect(screenX, this.y, this.w, this.h);
-                    // Arrow Down
                     ctx.beginPath(); ctx.moveTo(screenX + 20, this.y + 70); ctx.lineTo(screenX + 10, this.y + 50); ctx.lineTo(screenX + 30, this.y + 50); ctx.fill();
                 }
             }
@@ -908,9 +872,7 @@
             }
         }
 
-        // Helper to check for nearby orbs to prioritize them over Double Jump
         function isOverlappingOrb() {
-            // Check a wider area around the player for intention
             const margin = 30; 
             const p = { 
                 l: player.x + 12 - margin, 
@@ -924,12 +886,8 @@
                      let screenX = obs.worldX - cameraX;
                      if (screenX > width || screenX + obs.w < 0) continue;
                      
-                     // Orbs have full hitbox for this check
                      const o = { l: screenX, r: screenX + obs.w, t: obs.y, b: obs.y + obs.h };
-                     
-                     if (p.r > o.l && p.l < o.r && p.b > o.t && p.t < o.b) {
-                         return true;
-                     }
+                     if (p.r > o.l && p.l < o.r && p.b > o.t && p.t < o.b) return true;
                 }
             }
             return false;
@@ -950,7 +908,6 @@
                 let screenX = obs.worldX - cameraX;
                 if (screenX > width || screenX + obs.w < 0) continue;
 
-                // Default Hitbox (shrunk slightly for blocks/spikes)
                 const o = { l: screenX + 5, r: screenX + obs.w - 5, t: obs.y + 5, b: obs.y + obs.h };
 
                 if (obs.type === 'COIN') {
@@ -960,11 +917,8 @@
                     continue; 
                 }
                 
-                // ORB LOGIC
                 if (obs.type === 'ORB_YELLOW') {
-                    // Use a larger, more forgiving hitbox for the actual activation
                     const orbHitbox = { l: screenX, r: screenX + obs.w, t: obs.y, b: obs.y + obs.h };
-                    
                     if (p.r > orbHitbox.l && p.l < orbHitbox.r && p.b > orbHitbox.t && p.t < orbHitbox.b) {
                         if (isJumpHeld && !obs.hasTriggered) {
                             player.orbJump();
@@ -982,7 +936,6 @@
                              if (obs.type === 'PORTAL_CUBE') player.mode = 'CUBE';
                              if (obs.type === 'PORTAL_WAVE') player.mode = 'WAVE';
                              
-                             // Gravity Portals
                              if (obs.type === 'PORTAL_GRAVITY_UP') player.gravity = -1;
                              if (obs.type === 'PORTAL_GRAVITY_DOWN') player.gravity = 1;
 
@@ -1017,51 +970,40 @@
                             }
                         } 
                         else {
-                            // CUBE / SHIP COLLISION
-                            // Normal Gravity: Land on Top
                             if (player.gravity === 1) {
-                                if ((penetrationY < penetrationX + 20) && player.dy >= 0 && player.y + player.size < obs.y + 40) {
+                                if ((penetrationY < penetrationX + 30) && player.dy >= 0 && player.y + player.size < obs.y + 50) {
                                     player.isGrounded = true;
-                                    player.canDoubleJump = true; // RESET Double Jump on block
+                                    player.canDoubleJump = true; 
                                     player.dy = 0;
                                     player.y = obs.y - player.size;
                                     player.rotation = 0;
                                 } else {
-                                    // Hit head or side
-                                    // FIXED: Ship Ceiling Slide
-                                    // Check if we are physically hitting the bottom of the block (Ceiling)
-                                    // Condition: Vertical penetration is smaller than horizontal (meaning we hit Y face)
-                                    // AND we are closer to the bottom of the block than the top.
                                     const verticalCollision = penetrationY < penetrationX;
                                     const hittingCeiling = Math.abs(p.t - o.b) < Math.abs(p.b - o.t);
 
                                     if (player.mode === 'SHIP' && verticalCollision && hittingCeiling) {
-                                        player.y = obs.y + obs.h; // Slide on ceiling
-                                        if (player.dy < 0) player.dy = 0; // Stop upward velocity
+                                        player.y = obs.y + obs.h; 
+                                        if (player.dy < 0) player.dy = 0; 
                                     } else {
-                                        // Wall hit or Cube Head Hit -> Death
                                         gameOver(); return;
                                     }
                                 }
                             } 
-                            // Inverted Gravity: Land on Bottom (Ceiling)
                             else {
                                 let hitBottom = Math.abs(p.t - o.b) < Math.abs(p.b - o.t);
                                 
-                                if ((penetrationY < penetrationX + 20) && player.dy <= 0 && hitBottom) {
+                                if ((penetrationY < penetrationX + 30) && player.dy <= 0 && hitBottom) {
                                     player.isGrounded = true;
-                                    player.canDoubleJump = true; // RESET Double Jump on ceiling block
+                                    player.canDoubleJump = true; 
                                     player.dy = 0;
-                                    player.y = obs.y + obs.h; // Snap to bottom
+                                    player.y = obs.y + obs.h; 
                                     player.rotation = 0;
                                 } else {
-                                    // Hit head (ground/top of block) or side
-                                    // FIXED: Ship Floor Slide (Inverted)
                                     const verticalCollision = penetrationY < penetrationX;
                                     const hittingTop = !hitBottom;
 
                                     if (player.mode === 'SHIP' && verticalCollision && hittingTop) {
-                                         player.y = obs.y - player.size; // Slide on floor
+                                         player.y = obs.y - player.size; 
                                          if (player.dy > 0) player.dy = 0;
                                     } else {
                                         gameOver(); return;
@@ -1074,7 +1016,7 @@
                     if (p.r > o.l && p.l < o.r && p.b > o.t && p.t < o.b) {
                         player.dy = -42 * player.gravity; 
                         player.isGrounded = false; playSound('jump');
-                        player.canDoubleJump = true; // Pads refresh double jump
+                        player.canDoubleJump = true; 
                     }
                 }
             }
@@ -1087,17 +1029,17 @@
         function loop() {
             if (gameState === 'PLAYING') {
                 cameraX += gameSpeed;
+                if (isJumpHeld) player.jump(); 
                 
-                // Continuous jump logic (Ground Only)
-                if (isJumpHeld) {
-                    player.jump(); // Will only jump if isGrounded is true
+                // SAFETY CHECK: Ensure dimensions are valid before rendering
+                if (!width || !height || width <= 0 || height <= 0) {
+                    requestAnimationFrame(loop);
+                    return;
                 }
-                
-                // FIXED LOOP ORDER: Update (Phys) -> Collide (Correct) -> Trail (Record)
+
                 player.update();
                 checkCollisions();
                 player.updateTrail(); 
-
                 let pct = Math.min(100, (cameraX / levelLength) * 100);
                 progressFill.style.width = `${pct}%`;
                 if (cameraX > levelLength) levelComplete();
@@ -1116,7 +1058,9 @@
             ctx.save();
             if (cameraShake > 0) ctx.translate((Math.random()-0.5)*cameraShake, (Math.random()-0.5)*cameraShake);
             
-            let grd = ctx.createLinearGradient(0, 0, 0, height);
+            // Safety check for gradient creation
+            let safeHeight = height > 0 ? height : 720;
+            let grd = ctx.createLinearGradient(0, 0, 0, safeHeight);
             grd.addColorStop(0, `hsl(${bgHue}, 70%, 20%)`);
             grd.addColorStop(1, `hsl(${bgHue}, 70%, 5%)`);
             ctx.fillStyle = grd; ctx.fillRect(0, 0, width, height);
@@ -1130,7 +1074,10 @@
 
             ctx.beginPath(); ctx.moveTo(0, groundY); ctx.lineTo(width, groundY);
             ctx.strokeStyle = '#FFF'; ctx.lineWidth = 3; ctx.stroke();
-            let groundGrad = ctx.createLinearGradient(0, groundY, 0, height);
+            
+            // Safety check for ground gradient
+            let safeGroundY = !isNaN(groundY) ? groundY : height - 150;
+            let groundGrad = ctx.createLinearGradient(0, safeGroundY, 0, safeHeight);
             groundGrad.addColorStop(0, `hsl(${bgHue}, 60%, 30%)`);
             groundGrad.addColorStop(1, `hsl(${bgHue}, 60%, 10%)`);
             ctx.fillStyle = groundGrad; ctx.fillRect(0, groundY, width, height - groundY);
@@ -1150,23 +1097,18 @@
             requestAnimationFrame(loop);
         }
 
-        // --- CORE FUNCTIONS DEFINITIONS ---
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            groundY = height - 150;
-        }
-        window.addEventListener('resize', resize);
-        
+        // --- MISSING FUNCTIONS RESTORED ---
+
         function updateLevelMenu() {
             const levelKey = LEVELS_LIST[currentLevelIndex];
-            menuLevelTitle.innerText = levelKey.replace(/_/g, ' ');
-            if (levelKey === 'CUSTOM') menuLevelDiff.innerText = 'Difficulty: ???';
-            else if (levelKey === 'BACK_ON_TRACK') menuLevelDiff.innerText = 'Difficulty: Hard';
-            else if (levelKey === 'POLARGEIST') menuLevelDiff.innerText = 'Difficulty: Harder';
-            else if (levelKey === 'JUMPER') menuLevelDiff.innerText = 'Difficulty: Harder';
-            else if (levelKey === 'SUPER_WAVE') menuLevelDiff.innerText = 'Difficulty: Insane';
-            else menuLevelDiff.innerText = 'Difficulty: Easy';
+            if(menuLevelTitle) menuLevelTitle.innerText = levelKey.replace(/_/g, ' ');
+            if(menuLevelDiff) {
+                if (levelKey === 'CUSTOM') menuLevelDiff.innerText = 'Difficulty: ???';
+                else if (levelKey === 'BACK_ON_TRACK') menuLevelDiff.innerText = 'Difficulty: Hard';
+                else if (levelKey === 'JUMPER') menuLevelDiff.innerText = 'Difficulty: Harder';
+                else if (levelKey === 'SUPER_WAVE') menuLevelDiff.innerText = 'Difficulty: Insane';
+                else menuLevelDiff.innerText = 'Difficulty: Easy';
+            }
         }
 
         function goToMenu() {
@@ -1184,71 +1126,16 @@
         }
 
         function init() {
-            resize();
             updateCoinDisplay();
             updateLevelMenu();
             goToMenu();
-        }
-
-        function openEditor() {
-            gameState = 'EDITOR';
-            uiMenu.style.display = 'none';
-            editorUI.style.display = 'flex';
-            editorTop.style.display = 'flex';
-            editorScrollX = 0;
-        }
-
-        function exitEditor() { goToMenu(); }
-
-        function selectTool(tool) {
-            selectedTool = tool;
-            document.querySelectorAll('.editor-tool').forEach(el => el.classList.remove('selected'));
-            document.getElementById(`tool-${tool}`).classList.add('selected');
-        }
-
-        function drawEditor() {
-            editorLevelData.forEach(item => {
-                let screenX = (item.x * GRID_SIZE) - editorScrollX;
-                if (screenX > -60 && screenX < width) {
-                    const mockDef = {x: item.x, y: item.y, type: item.type};
-                    const obs = new Obstacle(mockDef);
-                    obs.draw(screenX);
-                }
-            });
-        }
-
-        function handleEditorClick(e) {
-            if (gameState !== 'EDITOR') return;
-            if (e.target.closest('#editor-ui') || e.target.closest('#editor-top-bar')) return;
-            const rect = canvas.getBoundingClientRect();
-            const clickX = e.clientX - rect.left;
-            const clickY = e.clientY - rect.top;
-            const worldX = clickX + editorScrollX;
-            const gridX = Math.floor(worldX / GRID_SIZE);
-            const distFromGround = groundY - clickY;
-            const gridY = Math.floor(distFromGround / GRID_SIZE);
-            if (gridY < 0) return; 
-            const existingIdx = editorLevelData.findIndex(i => i.x === gridX && i.y === gridY);
-            if (selectedTool === 'ERASER') {
-                if (existingIdx !== -1) editorLevelData.splice(existingIdx, 1);
-            } else {
-                if (existingIdx !== -1) editorLevelData.splice(existingIdx, 1);
-                editorLevelData.push({x: gridX, y: gridY, type: selectedTool});
-            }
-        }
-
-        function saveCustomLevel() { saveGame(); alert("Level Saved!"); }
-
-        function testCustomLevel() {
-            currentLevelIndex = LEVELS_LIST.indexOf('CUSTOM');
-            updateLevelMenu();
-            startCurrentLevel();
         }
 
         function nextLevel() {
             currentLevelIndex = (currentLevelIndex + 1) % LEVELS_LIST.length;
             updateLevelMenu();
         }
+
         function prevLevel() {
             currentLevelIndex = (currentLevelIndex - 1 + LEVELS_LIST.length) % LEVELS_LIST.length;
             updateLevelMenu();
@@ -1271,8 +1158,13 @@
             const defs = levelData;
             activeObstacles = defs.map(d => new Obstacle({...d, x: d.x + 15}));
             
-            const lastObj = activeObstacles[activeObstacles.length-1];
-            levelLength = lastObj ? lastObj.worldX + 800 : 2000;
+            let maxWorldX = 0;
+            for (let obs of activeObstacles) {
+                if (obs.worldX > maxWorldX) {
+                    maxWorldX = obs.worldX;
+                }
+            }
+            levelLength = maxWorldX + 800; 
 
             player = new Player();
             particles = [];
@@ -1320,9 +1212,12 @@
             uiComplete.style.display = 'block';
             backBtn.style.display = 'none';
             progressBar.style.display = 'none';
-            document.getElementById('level-stats').innerText = `Coins Collected: ${coinsCollectedInRun}`;
+            if (document.getElementById('level-stats')) {
+                document.getElementById('level-stats').innerText = `Coins Collected: ${coinsCollectedInRun}`;
+            }
         }
-        
+
+        // Shop Functions
         function openShop() { uiMenu.style.display = 'none'; uiShop.style.display = 'block'; renderShop(); }
         function closeShop() { uiShop.style.display = 'none'; uiMenu.style.display = 'flex'; }
         
@@ -1350,6 +1245,67 @@
             });
         }
 
+        // Editor Functions
+        function openEditor() {
+            gameState = 'EDITOR';
+            uiMenu.style.display = 'none';
+            editorUI.style.display = 'flex';
+            editorTop.style.display = 'flex';
+            editorScrollX = 0;
+        }
+
+        function exitEditor() { goToMenu(); }
+
+        function selectTool(tool) {
+            selectedTool = tool;
+            document.querySelectorAll('.editor-tool').forEach(el => el.classList.remove('selected'));
+            const el = document.getElementById(`tool-${tool}`);
+            if(el) el.classList.add('selected');
+        }
+
+        function drawEditor() {
+            editorLevelData.forEach(item => {
+                let screenX = (item.x * GRID_SIZE) - editorScrollX;
+                if (screenX > -60 && screenX < width) {
+                    const mockDef = {x: item.x, y: item.y, type: item.type};
+                    const obs = new Obstacle(mockDef);
+                    obs.draw(screenX);
+                }
+            });
+        }
+
+        function handleEditorClick(e) {
+            if (gameState !== 'EDITOR') return;
+            if (e.target.closest('#editor-ui') || e.target.closest('#editor-top-bar')) return;
+            const rect = canvas.getBoundingClientRect();
+            // Adjust for scale
+            const scale = canvas.width / rect.width;
+            const clickX = (e.clientX - rect.left) * scale;
+            const clickY = (e.clientY - rect.top) * scale;
+            
+            const worldX = clickX + editorScrollX;
+            const gridX = Math.floor(worldX / GRID_SIZE);
+            const distFromGround = groundY - clickY;
+            const gridY = Math.floor(distFromGround / GRID_SIZE);
+            if (gridY < 0) return; 
+            const existingIdx = editorLevelData.findIndex(i => i.x === gridX && i.y === gridY);
+            if (selectedTool === 'ERASER') {
+                if (existingIdx !== -1) editorLevelData.splice(existingIdx, 1);
+            } else {
+                if (existingIdx !== -1) editorLevelData.splice(existingIdx, 1);
+                editorLevelData.push({x: gridX, y: gridY, type: selectedTool});
+            }
+        }
+
+        function saveCustomLevel() { saveGame(); alert("Level Saved!"); }
+
+        function testCustomLevel() {
+            currentLevelIndex = LEVELS_LIST.indexOf('CUSTOM');
+            updateLevelMenu();
+            startCurrentLevel();
+        }
+
+        window.addEventListener('resize', resize);
         window.addEventListener('mousedown', (e) => {
             if(e.target.closest('.interactive') || e.target.closest('#editor-ui') || e.target.closest('#editor-top-bar')) return;
             if (gameState === 'EDITOR') handleEditorClick(e);
@@ -1377,10 +1333,7 @@
                     if (gameState === 'GAMEOVER') restartLevel();
                     else if (gameState === 'COMPLETE') goToMenu();
                     else if (gameState === 'PLAYING') {
-                        // FIX: Only trigger Double Jump if NOT overlapping an orb
-                        if (!isOverlappingOrb()) {
-                            player.attemptAirJump(); 
-                        }
+                        if (!isOverlappingOrb()) player.attemptAirJump(); 
                     }
                 }
                 isJumpHeld = true;
@@ -1396,10 +1349,7 @@
                     if (gameState === 'GAMEOVER') restartLevel();
                     else if (gameState === 'COMPLETE') goToMenu();
                     else if (gameState === 'PLAYING') {
-                        // FIX: Only trigger Double Jump if NOT overlapping an orb
-                        if (!isOverlappingOrb()) {
-                            player.attemptAirJump(); 
-                        }
+                        if (!isOverlappingOrb()) player.attemptAirJump(); 
                     }
                 }
                 isJumpHeld = true;
@@ -1407,6 +1357,8 @@
         }, {passive: false});
         window.addEventListener('touchend', () => isJumpHeld = false);
 
+        // Run resize once before loop to set initial dimensions
+        resize();
         init();
         loop();
 
